@@ -11,3 +11,4 @@
 /.phpstan/
 /.phpunit.cache/
 .DS_Store
+/.env
