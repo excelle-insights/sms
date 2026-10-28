@@ -8,4 +8,6 @@
 /.vscode/
 /storage/
 /coverage/
+/.phpstan/
+/.phpunit.cache/
 .DS_Store
