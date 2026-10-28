@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+use Dotenv\Dotenv;
+
+$envPath = is_file(getcwd() . '/.env') ? getcwd() : __DIR__ . '/..';
+Dotenv::createImmutable($envPath)->safeLoad();
+
 return [
     'table_prefix' => $_ENV['SMS_TABLE_PREFIX'] ?? 'sms_',
     'encryption_key' => $_ENV['SMS_ENCRYPTION_KEY'] ?? '',
@@ -12,13 +17,13 @@ return [
     'retry_attempts' => 5,
     'retry_delays' => [1, 2, 4, 8, 16],
     'idempotency_key_ttl_hours' => 24,
-    'db_dsn' => sprintf(
+    'db_dsn' => $_ENV['DB_DSN'] ?? sprintf(
         'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
         $_ENV['DB_HOST'] ?? '127.0.0.1',
         $_ENV['DB_PORT'] ?? '3306',
-        $_ENV['DB_DATABASE'] ?? 'excelle',
+        $_ENV['DB_NAME'] ?? 'excelle',
     ),
-    'db_user' => $_ENV['DB_USERNAME'] ?? 'root',
+    'db_user' => $_ENV['DB_USER'] ?? 'root',
     'db_pass' => $_ENV['DB_PASSWORD'] ?? '',
     'worker_lock_file' => __DIR__ . '/../storage/sms-worker.lock',
     'worker_run_seconds' => 55,

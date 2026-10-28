@@ -9,15 +9,20 @@ declare(strict_types=1);
  * Usage:
  *   php migrate.php [path/to/config.php]
  *
- * The config file should return an array with:
- *   - db_dsn   (e.g. "mysql:host=127.0.0.1;port=3306;dbname=excelle;charset=utf8mb4")
- *   - db_user
- *   - db_pass
- *   - table_prefix (optional, default "sms_")
+ * Configuration is loaded from a `.env` file in the current working directory
+ * or from an optional PHP config file passed as the first argument.
+ *
+ * Required environment / config values:
+ *   - DB_DSN (or DB_HOST + DB_NAME)
+ *   - DB_USER
+ *   - DB_PASSWORD
+ *   - SMS_TABLE_PREFIX (optional, default "sms_")
  *
  * When installed as a Composer dependency the host application can run:
- *   php vendor/excelle-insights/sms/migrate.php [config/sms.php]
+ *   php vendor/excelle-insights/sms/migrate.php
  */
+
+use Dotenv\Dotenv;
 
 $autoloadFiles = [
     __DIR__ . '/vendor/autoload.php',
@@ -39,43 +44,46 @@ if ($autoloader === null) {
 
 require $autoloader;
 
-$configFile = $argv[1] ?? getcwd() . '/config/sms.php';
-if (!file_exists($configFile)) {
-    $fallback = __DIR__ . '/config/sms.php';
-    if (file_exists($fallback)) {
-        $configFile = $fallback;
-    } else {
-        fwrite(STDERR, "Config file not found: {$configFile}\n");
+// Load .env from the current working directory if it exists.
+$envPath = getcwd();
+if ($envPath !== false && is_file($envPath . '/.env')) {
+    Dotenv::createImmutable($envPath)->safeLoad();
+}
+
+// Allow an optional PHP config file to override or supplement .env.
+$config = [];
+if (isset($argv[1])) {
+    if (!file_exists($argv[1])) {
+        fwrite(STDERR, "Config file not found: {$argv[1]}\n");
         exit(1);
+    }
+
+    $loaded = require $argv[1];
+    if (is_array($loaded)) {
+        $config = $loaded;
     }
 }
 
-$config = require $configFile;
-if (!is_array($config)) {
-    fwrite(STDERR, "Config file must return an array.\n");
-    exit(1);
-}
-
-$dsn = $config['db_dsn'] ?? '';
-$user = $config['db_user'] ?? '';
-$pass = $config['db_pass'] ?? '';
-$tablePrefix = $config['table_prefix'] ?? 'sms_';
+$dsn = $config['db_dsn'] ?? $_ENV['DB_DSN'] ?? '';
+$user = $config['db_user'] ?? $_ENV['DB_USER'] ?? '';
+$pass = $config['db_pass'] ?? $_ENV['DB_PASSWORD'] ?? '';
+$tablePrefix = $config['table_prefix'] ?? $_ENV['SMS_TABLE_PREFIX'] ?? 'sms_';
 
 if ($dsn === '' || $user === '') {
-    fwrite(STDERR, "Config must provide `db_dsn` and `db_user`.\n");
+    fwrite(STDERR, "DB_DSN and DB_USER must be provided via .env or config file.\n");
     exit(1);
 }
 
 $parsed = parseDsn($dsn);
 if ($parsed === null) {
-    fwrite(STDERR, "Unable to parse `db_dsn`: {$dsn}\n");
+    fwrite(STDERR, "Unable to parse DB_DSN: {$dsn}\n");
     exit(1);
 }
 
 $_ENV['DB_HOST'] = $parsed['host'];
 $_ENV['DB_PORT'] = $parsed['port'];
-$_ENV['DB_DATABASE'] = $parsed['name'];
-$_ENV['DB_USERNAME'] = $user;
+$_ENV['DB_NAME'] = $parsed['name'];
+$_ENV['DB_USER'] = $user;
 $_ENV['DB_PASSWORD'] = $pass;
 $_ENV['SMS_TABLE_PREFIX'] = $tablePrefix;
 
@@ -129,9 +137,5 @@ function parseDsn(string $dsn): ?array
         }
     }
 
-    if ($parts['name'] === '') {
-        return null;
-    }
-
-    return $parts;
+    return $parts['name'] !== '' ? $parts : null;
 }

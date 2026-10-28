@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use Dotenv\Dotenv;
 use ExcelleInsights\Sms\Facade\SmsManager;
 use ExcelleInsights\Sms\Support\DatabaseLogger;
 use ExcelleInsights\Sms\Support\DefaultHttpClient;
+
+$envPath = is_file(getcwd() . '/.env') ? getcwd() : __DIR__ . '/..';
+Dotenv::createImmutable($envPath)->safeLoad();
 
 $config = require __DIR__ . '/../config/sms.php';
 

@@ -10,7 +10,22 @@ composer require excelle-insights/sms
 
 ## Configuration
 
-Create a bootstrap config file in your application:
+Create a `.env` file in your project root (see `.env.example` in this package):
+
+```dotenv
+DB_HOST=127.0.0.1
+DB_NAME=kenya_homes
+DB_USER=root
+DB_PASSWORD=
+DB_DSN=mysql:host=127.0.0.1;dbname=kenya_homes
+
+SMS_TABLE_PREFIX=sms_
+SMS_ENCRYPTION_KEY=
+SMS_DEFAULT_COUNTRY=KE
+SMS_DEFAULT_PROVIDER=africastalking
+```
+
+You can also create a bootstrap config file if you prefer:
 
 ```php
 <?php
@@ -25,33 +40,27 @@ return [
     'retry_attempts' => 5,
     'retry_delays' => [1, 2, 4, 8, 16],
     'idempotency_key_ttl_hours' => 24,
-    'db_dsn' => sprintf(
+    'db_dsn' => $_ENV['DB_DSN'] ?? sprintf(
         'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
         $_ENV['DB_HOST'] ?? '127.0.0.1',
         $_ENV['DB_PORT'] ?? '3306',
-        $_ENV['DB_DATABASE'] ?? 'excelle',
+        $_ENV['DB_NAME'] ?? 'excelle',
     ),
-    'db_user' => $_ENV['DB_USERNAME'] ?? 'root',
+    'db_user' => $_ENV['DB_USER'] ?? 'root',
     'db_pass' => $_ENV['DB_PASSWORD'] ?? '',
 ];
 ```
 
-Run the migrations using the bundled script:
+Run the migrations:
 
 ```bash
 php vendor/excelle-insights/sms/migrate.php
 ```
 
-The script expects a config file at `config/sms.php` in your current working directory. Pass an explicit path if needed:
+The runner loads `.env` from the current working directory and uses `DB_DSN`, `DB_USER` and `DB_PASSWORD`. You can optionally pass a PHP config file to override values:
 
 ```bash
 php vendor/excelle-insights/sms/migrate.php /path/to/config/sms.php
-```
-
-Alternatively, use Phinx directly:
-
-```bash
-vendor/bin/phinx migrate -c vendor/excelle-insights/sms/phinx.php
 ```
 
 ## Initialise the manager

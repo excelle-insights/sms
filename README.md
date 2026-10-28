@@ -36,6 +36,25 @@ composer require excelle-insights/sms
 
 ## Quick start
 
+Create a `.env` file in your project root (copy from `.env.example`):
+
+```dotenv
+DB_HOST=127.0.0.1
+DB_NAME=kenya_homes
+DB_USER=root
+DB_PASSWORD=
+DB_DSN=mysql:host=127.0.0.1;dbname=kenya_homes
+SMS_DEFAULT_PROVIDER=africastalking
+```
+
+Run the migrations:
+
+```bash
+php vendor/excelle-insights/sms/migrate.php
+```
+
+Use the package in your code:
+
 ```php
 use ExcelleInsights\Sms\Facade\SmsManager;
 use ExcelleInsights\Sms\Support\DatabaseLogger;
