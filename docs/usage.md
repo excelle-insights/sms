@@ -36,7 +36,19 @@ return [
 ];
 ```
 
-Run the Phinx migrations:
+Run the migrations using the bundled script:
+
+```bash
+php vendor/excelle-insights/sms/migrate.php
+```
+
+The script expects a config file at `config/sms.php` in your current working directory. Pass an explicit path if needed:
+
+```bash
+php vendor/excelle-insights/sms/migrate.php /path/to/config/sms.php
+```
+
+Alternatively, use Phinx directly:
 
 ```bash
 vendor/bin/phinx migrate -c vendor/excelle-insights/sms/phinx.php
