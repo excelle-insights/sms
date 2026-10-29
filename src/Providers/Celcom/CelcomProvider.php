@@ -198,6 +198,10 @@ class CelcomProvider implements SmsProviderInterface
             throw new \RuntimeException('Celcom config resolver did not return a valid config');
         }
 
+        if ($config->partnerId === '' || $config->apiKey === '') {
+            throw new \RuntimeException('Celcom credentials are not configured');
+        }
+
         return $config;
     }
 

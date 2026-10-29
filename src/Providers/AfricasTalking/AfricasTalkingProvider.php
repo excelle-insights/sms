@@ -224,6 +224,10 @@ class AfricasTalkingProvider implements SmsProviderInterface
             throw new \RuntimeException("Africa's Talking config resolver did not return a valid config");
         }
 
+        if ($config->username === '' || $config->apiKey === '') {
+            throw new \RuntimeException("Africa's Talking credentials are not configured");
+        }
+
         return $config;
     }
 

@@ -64,6 +64,24 @@ final class CelcomProviderTest extends TestCase
         self::assertSame('P123', $body['partnerID']);
     }
 
+    public function testSendThrowsWhenCredentialsAreMissing(): void
+    {
+        $provider = new CelcomProvider(
+            $this->httpClient,
+            new CelcomResponseMapper(),
+            fn (): CelcomConfig => new CelcomConfig(
+                partnerId: '',
+                apiKey: '',
+                senderId: 'SENDER',
+            ),
+        );
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Celcom credentials are not configured');
+
+        $provider->send(new SendRequest(to: '+254712345678', body: 'Hello'));
+    }
+
     public function testSendThrowsOnPermanentError(): void
     {
         $this->httpClient->queueResponse(new HttpResponse(200, $this->json([
