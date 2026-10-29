@@ -32,23 +32,23 @@ final class CreateSmsTables extends AbstractMigration
         $this->prefix = $this->getAdapter()->getOption('table_prefix') ?? 'sms_';
 
         $this->table('http_request_logs')->drop()->save();
-        $this->table($this->prefix . 'logs')->drop()->save();
-        $this->table($this->prefix . 'webhook_logs')->drop()->save();
-        $this->table($this->prefix . 'opt_outs')->drop()->save();
-        $this->table($this->prefix . 'inbound_messages')->drop()->save();
-        $this->table($this->prefix . 'template_versions')->drop()->save();
-        $this->table($this->prefix . 'templates')->drop()->save();
-        $this->table($this->prefix . 'tenant_settings')->drop()->save();
-        $this->table($this->prefix . 'status_changes')->drop()->save();
-        $this->table($this->prefix . 'delivery_reports')->drop()->save();
-        $this->table($this->prefix . 'batches')->drop()->save();
-        $this->table($this->prefix . 'messages')->drop()->save();
-        $this->table($this->prefix . 'provider_configs')->drop()->save();
+        $this->table('logs')->drop()->save();
+        $this->table('webhook_logs')->drop()->save();
+        $this->table('opt_outs')->drop()->save();
+        $this->table('inbound_messages')->drop()->save();
+        $this->table('template_versions')->drop()->save();
+        $this->table('templates')->drop()->save();
+        $this->table('tenant_settings')->drop()->save();
+        $this->table('status_changes')->drop()->save();
+        $this->table('delivery_reports')->drop()->save();
+        $this->table('batches')->drop()->save();
+        $this->table('messages')->drop()->save();
+        $this->table('provider_configs')->drop()->save();
     }
 
     private function createProviderConfigsTable(): void
     {
-        $table = $this->table($this->prefix . 'provider_configs', ['id' => true, 'signed' => false]);
+        $table = $this->table('provider_configs', ['id' => true, 'signed' => false]);
         $table
             ->addColumn('tenant_id', 'integer', ['null' => true, 'signed' => false])
             ->addColumn('provider_key', 'string', ['limit' => 64, 'null' => false])
@@ -73,7 +73,7 @@ final class CreateSmsTables extends AbstractMigration
 
     private function createMessagesTable(): void
     {
-        $table = $this->table($this->prefix . 'messages', ['id' => true, 'signed' => false]);
+        $table = $this->table('messages', ['id' => true, 'signed' => false]);
         $table
             ->addColumn('tenant_id', 'integer', ['null' => true, 'signed' => false])
             ->addColumn('batch_id', 'biginteger', ['null' => true, 'signed' => false])
@@ -109,7 +109,7 @@ final class CreateSmsTables extends AbstractMigration
 
     private function createBatchesTable(): void
     {
-        $table = $this->table($this->prefix . 'batches', ['id' => true, 'signed' => false]);
+        $table = $this->table('batches', ['id' => true, 'signed' => false]);
         $table
             ->addColumn('tenant_id', 'integer', ['null' => true, 'signed' => false])
             ->addColumn('status', 'string', ['limit' => 32, 'null' => false, 'default' => 'queued'])
@@ -127,7 +127,7 @@ final class CreateSmsTables extends AbstractMigration
 
     private function createDeliveryReportsTable(): void
     {
-        $table = $this->table($this->prefix . 'delivery_reports', ['id' => true, 'signed' => false]);
+        $table = $this->table('delivery_reports', ['id' => true, 'signed' => false]);
         $table
             ->addColumn('message_id', 'biginteger', ['null' => false, 'signed' => false])
             ->addColumn('provider', 'string', ['limit' => 64, 'null' => false])
@@ -144,7 +144,7 @@ final class CreateSmsTables extends AbstractMigration
 
     private function createStatusChangesTable(): void
     {
-        $table = $this->table($this->prefix . 'status_changes', ['id' => true, 'signed' => false]);
+        $table = $this->table('status_changes', ['id' => true, 'signed' => false]);
         $table
             ->addColumn('message_id', 'biginteger', ['null' => true, 'signed' => false])
             ->addColumn('batch_id', 'biginteger', ['null' => true, 'signed' => false])
@@ -161,7 +161,7 @@ final class CreateSmsTables extends AbstractMigration
 
     private function createTenantSettingsTable(): void
     {
-        $table = $this->table($this->prefix . 'tenant_settings', ['id' => true, 'signed' => false]);
+        $table = $this->table('tenant_settings', ['id' => true, 'signed' => false]);
         $table
             ->addColumn('tenant_id', 'integer', ['null' => false, 'signed' => false])
             ->addColumn('default_timezone', 'string', ['limit' => 64, 'null' => false, 'default' => 'Africa/Nairobi'])
@@ -173,7 +173,7 @@ final class CreateSmsTables extends AbstractMigration
 
     private function createTemplatesTable(): void
     {
-        $table = $this->table($this->prefix . 'templates', ['id' => true, 'signed' => false]);
+        $table = $this->table('templates', ['id' => true, 'signed' => false]);
         $table
             ->addColumn('tenant_id', 'integer', ['null' => true, 'signed' => false])
             ->addColumn('key', 'string', ['limit' => 128, 'null' => false])
@@ -190,7 +190,7 @@ final class CreateSmsTables extends AbstractMigration
 
     private function createTemplateVersionsTable(): void
     {
-        $table = $this->table($this->prefix . 'template_versions', ['id' => true, 'signed' => false]);
+        $table = $this->table('template_versions', ['id' => true, 'signed' => false]);
         $table
             ->addColumn('template_id', 'integer', ['null' => false, 'signed' => false])
             ->addColumn('version', 'integer', ['null' => false, 'signed' => false])
@@ -204,7 +204,7 @@ final class CreateSmsTables extends AbstractMigration
 
     private function createInboundMessagesTable(): void
     {
-        $table = $this->table($this->prefix . 'inbound_messages', ['id' => true, 'signed' => false]);
+        $table = $this->table('inbound_messages', ['id' => true, 'signed' => false]);
         $table
             ->addColumn('tenant_id', 'integer', ['null' => true, 'signed' => false])
             ->addColumn('provider', 'string', ['limit' => 64, 'null' => false])
@@ -222,7 +222,7 @@ final class CreateSmsTables extends AbstractMigration
 
     private function createOptOutsTable(): void
     {
-        $table = $this->table($this->prefix . 'opt_outs', ['id' => true, 'signed' => false]);
+        $table = $this->table('opt_outs', ['id' => true, 'signed' => false]);
         $table
             ->addColumn('tenant_id', 'integer', ['null' => true, 'signed' => false])
             ->addColumn('phone_number', 'string', ['limit' => 32, 'null' => false])
@@ -234,7 +234,7 @@ final class CreateSmsTables extends AbstractMigration
 
     private function createWebhookLogsTable(): void
     {
-        $table = $this->table($this->prefix . 'webhook_logs', ['id' => true, 'signed' => false]);
+        $table = $this->table('webhook_logs', ['id' => true, 'signed' => false]);
         $table
             ->addColumn('tenant_id', 'integer', ['null' => true, 'signed' => false])
             ->addColumn('provider', 'string', ['limit' => 64, 'null' => false])
@@ -248,7 +248,7 @@ final class CreateSmsTables extends AbstractMigration
 
     private function createLogsTable(): void
     {
-        $table = $this->table($this->prefix . 'logs', ['id' => true, 'signed' => false]);
+        $table = $this->table('logs', ['id' => true, 'signed' => false]);
         $table
             ->addColumn('level', 'string', ['limit' => 32, 'null' => false])
             ->addColumn('message', 'text', ['null' => false])

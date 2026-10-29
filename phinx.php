@@ -24,7 +24,7 @@ return [
         'migrations' => '%%PHINX_CONFIG_DIR%%/database/migrations',
     ],
     'environments' => [
-        'default_migration_table' => 'smsphinxlog',
+        'default_migration_table' => 'phinxlog',
         'default_environment' => 'development',
         'development' => [
             'adapter' => 'mysql',
