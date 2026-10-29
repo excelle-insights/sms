@@ -78,10 +78,24 @@ class CelcomProvider implements SmsProviderInterface
 
         $recipients = $this->mapper->extractRecipients($data);
         $recipient = $recipients[0] ?? [];
+        $recipientCode = (int) ($recipient['respose-code'] ?? $recipient['response-code'] ?? 500);
+
+        if ($this->mapper->isRecipientSuccessful($recipient)) {
+            return new SendResult(
+                status: MessageStatus::SENT,
+                providerMessageId: $this->mapper->getMessageId($recipient),
+            );
+        }
+
+        if (in_array($recipientCode, [100, 101, 102], true)) {
+            return new SendResult(
+                status: MessageStatus::QUEUED,
+                providerMessageId: $this->mapper->getMessageId($recipient),
+            );
+        }
 
         if (!$this->mapper->isRecipientSuccessful($recipient)) {
             $error = $this->mapper->getErrorMessage($recipient);
-            $recipientCode = (int) ($recipient['respose-code'] ?? 500);
 
             if ($this->mapper->isTransientErrorCode($recipientCode)) {
                 return new SendResult(status: MessageStatus::FAILED, error: $error);
@@ -89,11 +103,6 @@ class CelcomProvider implements SmsProviderInterface
 
             throw new \RuntimeException("Celcom permanent error: {$error}");
         }
-
-        return new SendResult(
-            status: MessageStatus::SENT,
-            providerMessageId: $this->mapper->getMessageId($recipient),
-        );
     }
 
     /**
@@ -141,9 +150,16 @@ class CelcomProvider implements SmsProviderInterface
         $results = [];
 
         foreach ($recipients as $recipient) {
+            $recipientCode = (int) ($recipient['respose-code'] ?? $recipient['response-code'] ?? 500);
+
             if ($this->mapper->isRecipientSuccessful($recipient)) {
                 $results[] = new SendResult(
                     status: MessageStatus::SENT,
+                    providerMessageId: $this->mapper->getMessageId($recipient),
+                );
+            } elseif (in_array($recipientCode, [100, 101, 102], true)) {
+                $results[] = new SendResult(
+                    status: MessageStatus::QUEUED,
                     providerMessageId: $this->mapper->getMessageId($recipient),
                 );
             } else {
