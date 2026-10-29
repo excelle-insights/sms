@@ -64,6 +64,29 @@ final class CelcomProviderTest extends TestCase
         self::assertSame('P123', $body['partnerID']);
     }
 
+    public function testSendReturnsQueuedResultForAcceptedRecipientStatus(): void
+    {
+        $this->httpClient->queueResponse(new HttpResponse(200, $this->json([
+            'response-code' => 200,
+            'response-description' => 'Success',
+            'responses' => [
+                [
+                    'respose-code' => 101,
+                    'response-description' => 'Processed',
+                    'mobile' => 254712345678,
+                    'messageid' => '8290842',
+                    'networkid' => '1',
+                ],
+            ],
+        ])));
+
+        $result = $this->provider->send(new SendRequest(to: '+254712345678', body: 'Hello'));
+
+        self::assertTrue($result->isSuccess());
+        self::assertSame(MessageStatus::QUEUED, $result->status);
+        self::assertSame('8290842', $result->providerMessageId);
+    }
+
     public function testSendThrowsWhenCredentialsAreMissing(): void
     {
         $provider = new CelcomProvider(
@@ -115,7 +138,7 @@ final class CelcomProviderTest extends TestCase
             'response-description' => 'Success',
             'responses' => [
                 ['respose-code' => 200, 'messageid' => '1'],
-                ['respose-code' => 200, 'messageid' => '2'],
+                ['respose-code' => 101, 'messageid' => '2'],
             ],
         ])));
 
@@ -126,6 +149,7 @@ final class CelcomProviderTest extends TestCase
 
         self::assertCount(2, $results);
         self::assertSame('1', $results[0]->providerMessageId);
+        self::assertSame(MessageStatus::QUEUED, $results[1]->status);
 
         $request = $this->httpClient->requests[0];
         self::assertStringContainsString('sendbulk', $request['url']);
