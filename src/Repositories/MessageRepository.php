@@ -161,7 +161,9 @@ class MessageRepository
              LIMIT :limit",
         );
 
-        $stmt->execute([':status' => MessageStatus::SCHEDULED->value, ':limit' => $limit]);
+        $stmt->bindValue(':status', MessageStatus::SCHEDULED->value);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
 
         return array_map([$this, 'mapRow'], $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
@@ -178,7 +180,9 @@ class MessageRepository
              LIMIT :limit",
         );
 
-        $stmt->execute([':status' => MessageStatus::QUEUED->value, ':limit' => $limit]);
+        $stmt->bindValue(':status', MessageStatus::QUEUED->value);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
 
         return array_map([$this, 'mapRow'], $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
@@ -195,11 +199,10 @@ class MessageRepository
              LIMIT :limit",
         );
 
-        $stmt->execute([
-            ':status' => MessageStatus::FAILED->value,
-            ':max_attempts' => $maxAttempts,
-            ':limit' => $limit,
-        ]);
+        $stmt->bindValue(':status', MessageStatus::FAILED->value);
+        $stmt->bindValue(':max_attempts', $maxAttempts, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
 
         return array_map([$this, 'mapRow'], $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
