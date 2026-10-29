@@ -27,12 +27,12 @@ class MessageRepository
              (tenant_id, batch_id, provider, provider_message_id, `to`, body, encoding, segments,
               status, delivery_status, approved_by, approved_at, rejected_reason,
               template_id, template_version, template_variables, scheduled_at, attempts,
-              idempotency_key, error, metadata, created_at, updated_at)
+              idempotency_key, error, origin, priority, metadata, created_at, updated_at)
              VALUES
              (:tenant_id, :batch_id, :provider, :provider_message_id, :to, :body, :encoding, :segments,
               :status, :delivery_status, :approved_by, :approved_at, :rejected_reason,
               :template_id, :template_version, :template_variables, :scheduled_at, :attempts,
-              :idempotency_key, :error, :metadata, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+              :idempotency_key, :error, :origin, :priority, :metadata, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
         );
 
         $stmt->execute([
@@ -56,6 +56,8 @@ class MessageRepository
             ':attempts' => $message->attempts,
             ':idempotency_key' => $message->idempotencyKey,
             ':error' => $message->error,
+            ':origin' => $message->origin,
+            ':priority' => $message->priority,
             ':metadata' => $message->metadata === null ? null : json_encode($message->metadata),
         ]);
 
@@ -172,7 +174,7 @@ class MessageRepository
         $stmt = $this->pdo->prepare(
             "SELECT * FROM {$this->table}
              WHERE status = :status
-             ORDER BY created_at ASC
+             ORDER BY priority ASC, created_at ASC
              LIMIT :limit",
         );
 
@@ -189,7 +191,7 @@ class MessageRepository
         $stmt = $this->pdo->prepare(
             "SELECT * FROM {$this->table}
              WHERE status = :status AND attempts < :max_attempts
-             ORDER BY updated_at ASC
+             ORDER BY priority ASC, updated_at ASC
              LIMIT :limit",
         );
 
@@ -295,6 +297,8 @@ class MessageRepository
             attempts: (int) $row['attempts'],
             idempotencyKey: $row['idempotency_key'] === null ? null : (string) $row['idempotency_key'],
             error: $row['error'] === null ? null : (string) $row['error'],
+            origin: (string) ($row['origin'] ?? 'campaign'),
+            priority: (int) ($row['priority'] ?? 5),
             createdAt: $this->parseDateTime($row['created_at']),
             updatedAt: $this->parseDateTime($row['updated_at']),
         );

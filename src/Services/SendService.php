@@ -100,6 +100,8 @@ class SendService
 
         $scheduledAt = $this->resolveScheduledAt($options);
         $status = $this->resolveInitialStatus($options);
+        $origin = (string) ($options['origin'] ?? 'campaign');
+        $priority = (int) ($options['priority'] ?? 5);
 
         $messageEntity = new Message(
             tenantId: $tenantId,
@@ -114,6 +116,8 @@ class SendService
             templateVariables: $templateVariables,
             scheduledAt: $scheduledAt,
             idempotencyKey: $idempotencyKey === '' ? null : $idempotencyKey,
+            origin: $origin,
+            priority: $priority,
             metadata: $options['metadata'] ?? null,
         );
 
@@ -179,6 +183,9 @@ class SendService
                     }
                 }
 
+                $origin = (string) ($recipient['origin'] ?? $options['origin'] ?? 'campaign');
+                $priority = (int) ($recipient['priority'] ?? $options['priority'] ?? 5);
+
                 $messageEntity = new Message(
                     tenantId: $tenantId,
                     batchId: $batch->id,
@@ -189,6 +196,8 @@ class SendService
                     segments: $rendered->segments,
                     status: $initialStatus,
                     scheduledAt: $scheduledAt,
+                    origin: $origin,
+                    priority: $priority,
                     metadata: $options['metadata'] ?? null,
                 );
 

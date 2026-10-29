@@ -129,6 +129,8 @@ Resolution order for every send:
 $result = $sms->send('0712345678', 'Your OTP is 4821', [
     'tenant_id' => 7,
     'sender_id' => 'MySenderID',
+    'origin' => 'otp',     // default: 'campaign'
+    'priority' => 1,       // lower is higher priority; default: 5
 ]);
 
 $result->status;        // MessageStatus::QUEUED
@@ -162,11 +164,13 @@ $result = $sms->send('0712345678', '', [
 
 ```php
 $batch = $sms->sendBulk([
-    ['to' => '0712345678', 'vars' => ['name' => 'Wanjiru']],
+    ['to' => '0712345678', 'vars' => ['name' => 'Wanjiru'], 'priority' => 1],
     ['to' => '0723456789', 'vars' => ['name' => 'Otieno']],
 ], 'Hi {name}, your statement is ready.', [
     'tenant_id' => 7,
     'template' => 'statement_ready',
+    'origin' => 'statement',
+    'priority' => 3,
 ]);
 
 $batch->batchId;
