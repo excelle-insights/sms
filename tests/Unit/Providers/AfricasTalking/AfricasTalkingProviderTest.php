@@ -65,6 +65,25 @@ final class AfricasTalkingProviderTest extends TestCase
         self::assertSame('test_key', $request['options']['headers']['apiKey']);
     }
 
+    public function testSendThrowsWhenCredentialsAreMissing(): void
+    {
+        $provider = new AfricasTalkingProvider(
+            $this->httpClient,
+            new AfricasTalkingResponseMapper(),
+            new AfricasTalkingWebhookParser(new AfricasTalkingResponseMapper()),
+            fn (): AfricasTalkingConfig => new AfricasTalkingConfig(
+                username: '',
+                apiKey: '',
+                senderId: 'TEST_SENDER',
+            ),
+        );
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Africa's Talking credentials are not configured");
+
+        $provider->send(new SendRequest(to: '+254712345678', body: 'Hello'));
+    }
+
     public function testSendThrowsOnPermanentError(): void
     {
         $this->httpClient->queueResponse(new HttpResponse(200, $this->json([
