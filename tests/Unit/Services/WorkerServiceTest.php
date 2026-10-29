@@ -52,6 +52,22 @@ final class WorkerServiceTest extends TestCase
         self::assertNotNull($updated->providerMessageId);
     }
 
+    public function testDispatchesHighPriorityMessagesFirst(): void
+    {
+        $low = $this->createMessage(MessageStatus::QUEUED, priority: 5);
+        $high = $this->createMessage(MessageStatus::QUEUED, priority: 1);
+
+        $this->worker->dispatchQueuedMessages(1);
+
+        $highUpdated = $this->messageRepository->findById((int) $high->id);
+        $lowUpdated = $this->messageRepository->findById((int) $low->id);
+
+        self::assertNotNull($highUpdated);
+        self::assertNotNull($lowUpdated);
+        self::assertSame(MessageStatus::SENT, $highUpdated->status);
+        self::assertSame(MessageStatus::QUEUED, $lowUpdated->status);
+    }
+
     public function testReleasesDueScheduledMessages(): void
     {
         $message = $this->createMessage(MessageStatus::SCHEDULED, (new \DateTimeImmutable('-1 minute'))->format('Y-m-d H:i:s'));
@@ -92,7 +108,7 @@ final class WorkerServiceTest extends TestCase
         self::assertSame(2, $updated->attempts);
     }
 
-    private function createMessage(MessageStatus $status, ?string $scheduledAt = null): Message
+    private function createMessage(MessageStatus $status, ?string $scheduledAt = null, int $priority = 5): Message
     {
         return $this->messageRepository->create(new Message(
             tenantId: 7,
@@ -101,6 +117,7 @@ final class WorkerServiceTest extends TestCase
             body: 'Test',
             status: $status,
             scheduledAt: $scheduledAt === null ? null : new \DateTimeImmutable($scheduledAt),
+            priority: $priority,
         ));
     }
 }

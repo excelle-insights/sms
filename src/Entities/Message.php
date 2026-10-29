@@ -32,6 +32,8 @@ class Message
         public readonly int $attempts = 0,
         public readonly ?string $idempotencyKey = null,
         public readonly ?string $error = null,
+        public readonly string $origin = 'campaign',
+        public readonly int $priority = 5,
         public readonly ?array $metadata = null,
         public readonly ?\DateTimeInterface $createdAt = null,
         public readonly ?\DateTimeInterface $updatedAt = null,

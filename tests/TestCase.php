@@ -59,6 +59,8 @@ CREATE TABLE sms_messages (
     attempts INTEGER DEFAULT 0,
     idempotency_key TEXT,
     error TEXT,
+    origin TEXT DEFAULT 'campaign',
+    priority INTEGER DEFAULT 5,
     metadata TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP

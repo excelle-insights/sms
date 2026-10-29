@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2026-10-29
+
+### Added
+- `origin` field on `sms_messages` with default `campaign` to track where a message was sent from.
+- `priority` field on `sms_messages` with default `5`. The worker dispatches lower numbers first (priority 1 before priority 5).
+- `options['origin']` and `options['priority']` support in `SmsManager::send()` and `SmsManager::sendBulk()`.
+- Migration to add `origin` and `priority` columns to existing installs.
+
 ## [1.0.4] - 2026-10-29
 
 ### Fixed
