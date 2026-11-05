@@ -17,7 +17,7 @@ use ExcelleInsights\Sms\Services\ProviderResolver;
 use ExcelleInsights\Sms\Services\SendService;
 use ExcelleInsights\Sms\Services\TemplateRenderer;
 use ExcelleInsights\Sms\Services\TemplateService;
-use ExcelleInsights\Sms\Support\Crypto;
+use ExcelleInsights\Sms\Support\OpenSslCrypto;
 use ExcelleInsights\Sms\Tests\TestCase;
 use ExcelleInsights\Sms\Validation\MessageValidator;
 use ExcelleInsights\Sms\Validation\PhoneNumberValidator;
@@ -33,7 +33,7 @@ final class SendServiceTest extends TestCase
         parent::setUp();
 
         $prefix = 'sms_';
-        $crypto = new Crypto(base64_encode(random_bytes(32)));
+        $crypto = new OpenSslCrypto(base64_encode(random_bytes(32)));
         $config = new SmsConfig([
             'encryption_key' => base64_encode(random_bytes(32)),
             'default_provider' => 'log',

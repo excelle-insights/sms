@@ -8,7 +8,7 @@ use ExcelleInsights\Sms\Config\SmsConfig;
 use ExcelleInsights\Sms\Exceptions\NoDefaultProviderException;
 use ExcelleInsights\Sms\Repositories\ProviderConfigRepository;
 use ExcelleInsights\Sms\Services\ProviderResolver;
-use ExcelleInsights\Sms\Support\Crypto;
+use ExcelleInsights\Sms\Support\OpenSslCrypto;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
@@ -32,7 +32,7 @@ final class ProviderResolverTest extends TestCase
             UNIQUE(tenant_id, provider_key)
         )');
 
-        $crypto = new Crypto(base64_encode(random_bytes(32)));
+        $crypto = new OpenSslCrypto(base64_encode(random_bytes(32)));
         $repository = new ProviderConfigRepository($this->pdo, $crypto, 'sms_');
         $config = new SmsConfig([
             'encryption_key' => base64_encode(random_bytes(32)),
@@ -70,7 +70,7 @@ final class ProviderResolverTest extends TestCase
     public function testThrowsWhenNoDefaultExists(): void
     {
         $resolver = new ProviderResolver(
-            new ProviderConfigRepository($this->pdo, new Crypto(base64_encode(random_bytes(32))), 'sms_'),
+            new ProviderConfigRepository($this->pdo, new OpenSslCrypto(base64_encode(random_bytes(32))), 'sms_'),
             new SmsConfig(['encryption_key' => base64_encode(random_bytes(32))]),
         );
 
