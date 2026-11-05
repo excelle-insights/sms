@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ExcelleInsights\Sms\Repositories;
 
-use ExcelleInsights\Sms\Support\Crypto;
+use ExcelleInsights\Sms\Support\CryptoInterface;
 use PDO;
 
 class ProviderConfigRepository
@@ -13,7 +13,7 @@ class ProviderConfigRepository
 
     public function __construct(
         private readonly PDO $pdo,
-        private readonly Crypto $crypto,
+        private readonly CryptoInterface $crypto,
         string $tablePrefix,
     ) {
         $this->table = $tablePrefix . 'provider_configs';

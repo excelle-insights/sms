@@ -38,7 +38,8 @@ use ExcelleInsights\Sms\Services\TemplateRenderer;
 use ExcelleInsights\Sms\Services\TemplateService;
 use ExcelleInsights\Sms\Services\WebhookService;
 use ExcelleInsights\Sms\Services\WorkerService;
-use ExcelleInsights\Sms\Support\Crypto;
+use ExcelleInsights\Sms\Support\CryptoInterface;
+use ExcelleInsights\Sms\Support\OpenSslCrypto;
 use ExcelleInsights\Sms\Validation\MessageValidator;
 use ExcelleInsights\Sms\Validation\PhoneNumberValidator;
 use ExcelleInsights\Sms\Validation\TemplateValidator;
@@ -48,7 +49,7 @@ use Psr\Log\LoggerInterface as PsrLoggerInterface;
 class SmsManager
 {
     private readonly SmsConfig $config;
-    private readonly Crypto $crypto;
+    private readonly CryptoInterface $crypto;
     private readonly ProviderConfigRepository $providerConfigRepository;
     private readonly ProviderRegistry $providerRegistry;
     private readonly ProviderResolver $providerResolver;
@@ -83,7 +84,7 @@ class SmsManager
         private readonly PsrLoggerInterface $logger,
     ) {
         $this->config = new SmsConfig($config);
-        $this->crypto = new Crypto($this->config->encryptionKey());
+        $this->crypto = new OpenSslCrypto($this->config->encryptionKey());
         $prefix = $this->config->tablePrefix();
 
         $this->providerConfigRepository = new ProviderConfigRepository($this->pdo, $this->crypto, $prefix);
